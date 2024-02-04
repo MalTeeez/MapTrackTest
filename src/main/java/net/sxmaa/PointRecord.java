@@ -40,14 +40,22 @@ public class PointRecord {
 
     public void addToRecord( Point p, String id, LocalDateTime time ) {
         if ( prevPoints.containsKey(id) ) {
+            //System.out.println("Point " + p.getId() + " already existed, calculating deltas.");
             p.setRotation(GeoUtils.calculateRotation(p, prevPoints.get(id)));
-            p.setSpeed(
-                    GeoUtils.calculateSpeed(
-                            p,
-                            prevPoints.get(id),
-                            time,
-                            prevPoints.get(id).getTime()
-                    ));
+            p.setSpeed(GeoUtils.calculateSpeed(
+                    p,
+                    prevPoints.get(id),
+                    time,
+                    prevPoints.get(id).getTime()
+                )
+            );
+            p.setRateofclimb(GeoUtils.calculateRateOfClimb(
+                    p,
+                    prevPoints.get(id),
+                    time,
+                    prevPoints.get(id).getTime()
+                )
+            );
         }
         if ( points.containsKey(id) ) {
             //System.out.println("Point " + p.getId() + " already existed moving it back to previous points.");

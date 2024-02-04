@@ -33,6 +33,7 @@ public class ExampleData {
 
     public static void readFromFile() {
         try(BufferedReader br = new BufferedReader(new FileReader("output.txt"))) {
+            System.out.println("Starting file read");
             String line = br.readLine();
             LocalDateTime startTime = getTime( line.split(",") );
             while (line != null) {

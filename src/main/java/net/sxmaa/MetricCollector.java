@@ -32,6 +32,8 @@ public class MetricCollector extends Collector implements Collector.Describable{
             metric.addMetric(Arrays.asList(p.getId(), "lon"), p.getLongitude());
             metric.addMetric(Arrays.asList(p.getId(), "rot"), p.getRotation());
             metric.addMetric(Arrays.asList(p.getId(), "hei"), p.getHeight());
+            metric.addMetric(Arrays.asList(p.getId(), "spd"), p.getSpeed());
+            metric.addMetric(Arrays.asList(p.getId(), "roc"), p.getRateofclimb());
         }
 
         return metric;

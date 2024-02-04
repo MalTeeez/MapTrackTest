@@ -11,6 +11,7 @@ public class Point {
     private double rotation;
     private int height;
     private double speed;
+    private double rateofclimb;
     private LocalDateTime time;
 
     public Point(double latitude, double longitude, double rotation, int height) {
@@ -20,6 +21,13 @@ public class Point {
         this.longitude = longitude;
         this.rotation = rotation;
         this.height = height;
+    }
+
+    public Point(double latitude, double longitude) {
+        Random rand = new Random();
+        this.id = String.valueOf(rand.nextInt(10)); /* between 100.000 and 999.999 */
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Point(String id, double latitude, double longitude, int height) {
@@ -57,6 +65,14 @@ public class Point {
         return time;
     }
 
+    public double getRateofclimb() {
+        return rateofclimb;
+    }
+
+    public void setRateofclimb(double rateofclimb) {
+        this.rateofclimb = rateofclimb;
+    }
+
     public void setSpeed(double speed) {
         this.speed = speed;
     }
@@ -77,11 +93,12 @@ public class Point {
     @Override
     public String toString() {
         return "Point Information: \n" +
-                "\tId:" + id +
-                "\tLatitude:" + latitude +
-                "\tLongitude:" + longitude +
-                "\tRotation:" + rotation +
-                "\tHeight:" + height +
-                "\tSpeed:" + speed;
+                "\n\tId:" + id +
+                "\n\tLatitude:" + latitude +
+                "\n\tLongitude:" + longitude +
+                "\n\tRotation:" + rotation +
+                "\n\tHeight:" + height +
+                "\n\tSpeed:" + speed +
+                "\n\tRate of Climb:" + rateofclimb;
     }
 }
