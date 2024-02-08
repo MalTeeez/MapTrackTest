@@ -5,7 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Random;
 
 import static java.lang.Thread.sleep;
@@ -35,11 +37,11 @@ public class ExampleData {
         try(BufferedReader br = new BufferedReader(new FileReader("output.txt"))) {
             System.out.println("Starting file read");
             String line = br.readLine();
-            LocalDateTime startTime = getTime( line.split(",") );
+            LocalTime startTime = getTime( line.split(",") );
             while (line != null) {
                 String[] l = line.split(",");
 
-                LocalDateTime time = getTime(l);
+                LocalTime time = getTime(l);
                 final Point p = getPoint(l);
                 p.setTime(time);
                 if ( ChronoUnit.MINUTES.between(startTime, time) > 5)
@@ -62,16 +64,19 @@ public class ExampleData {
     private static Point getPoint(String[] l) {
         String id = l[1];
         String squawk = l[2];
-        int altitude = Integer.parseInt(l[3]) * 100;
-        //Got bad readings from this guy
-        altitude = altitude == 204700 ? 0 : altitude;
+        String callsign = l[3];
+        int altitude = Integer.parseInt(l[4]) * 100;
+        // Exclude bad readings, since we don't track planes in space (satellites?)
+        if ( altitude > 60000 ) altitude = 0;
+        // Only set id to callsign if it actually exists for this plane, otherwise fallback to numeric id
+        id = !Objects.equals(callsign, "") ? callsign : id;
 
-        String lat_s = l[4].replaceAll("[^0-9]+", "");
+        String lat_s = l[5].replaceAll("[^0-9]+", "");
         double latitude = Double.parseDouble(lat_s.substring(0, 2));
         latitude += Double.parseDouble(lat_s.substring(2, 4)) / 60;
         latitude += Double.parseDouble(lat_s.substring(4, 6)) / 3600;
 
-        String lon_s = l[5].replaceAll("[^0-9]+", "");
+        String lon_s = l[6].replaceAll("[^0-9]+", "");
         double longitude = Double.parseDouble(lon_s.substring(0, 3));
         longitude += Double.parseDouble(lon_s.substring(3, 5)) / 60;
         longitude += Double.parseDouble(lon_s.substring(5, 7)) / 3600;
@@ -79,10 +84,9 @@ public class ExampleData {
         return new Point(id, latitude, longitude, altitude);
     }
 
-    private static LocalDateTime getTime(String[] l) {
+    private static LocalTime getTime(String[] l) {
         String[] times = l[0].split(":", 3);
-        LocalDate date = LocalDate.now();
-        return date.atTime(
+        return LocalTime.of(
                 Integer.parseInt(times[0]),
                 Integer.parseInt(times[1]),
                 Integer.parseInt(times[2].substring(0,2)),

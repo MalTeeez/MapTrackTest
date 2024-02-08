@@ -1,6 +1,7 @@
 package net.sxmaa;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 import static java.lang.Math.*;
@@ -30,11 +31,12 @@ public class GeoUtils {
         return (float) (beta / Math.PI * 180);
     }
 
-    public static double calculateSpeed(Point current, Point previous, LocalDateTime previousTime, LocalDateTime currentTime ) {
+    public static double calculateSpeed(Point current, Point previous, LocalTime previousTime, LocalTime currentTime ) {
         long deltaT = ChronoUnit.MILLIS.between(currentTime, previousTime);
         double distance = calculateDistance(current, previous);
         double speed = distance / deltaT; // In Kilometers per Millisecond (km/ms)
         speed *= 1000; // In Kilometers per Second (km/s)
+        if ( speed * 3600 > 5000 ) speed = 0; // Exclude ridiculous speeds, we don't have SR-71's anymore ):
         return speed * 3600; // In Kilometers per Hour (km/h)
     }
 
@@ -51,7 +53,7 @@ public class GeoUtils {
         return 2 * r * asin(sqrt(a));
     }
 
-    public static double calculateRateOfClimb( Point current, Point previous, LocalDateTime previousTime, LocalDateTime currentTime ) {
+    public static double calculateRateOfClimb( Point current, Point previous, LocalTime previousTime, LocalTime currentTime ) {
         double deltaT = ChronoUnit.MILLIS.between(currentTime, previousTime); // In seconds
         double deltaH = current.getHeight() - previous.getHeight();
         return (deltaH / deltaT) * 3600; // In Feet per Minute (ft/s)

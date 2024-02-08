@@ -20,7 +20,7 @@ public class Main {
         initCollectors();
 
         ExampleData.readFromFile();
-        br.readLine();
+        System.out.println("Finished processing and sending all flights, exiting.");
         http_server.close();
     }
 

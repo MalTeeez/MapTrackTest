@@ -1,6 +1,6 @@
 package net.sxmaa;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ public class PointRecord {
 
     private Map<String, Point> prevPoints = new HashMap<>();
 
-    public void clearCurrent( LocalDateTime time ) {
+    public void clearCurrent( LocalTime time ) {
         List<String> toDelete = new ArrayList<>();
         for ( Map.Entry<String, Point> entry : points.entrySet() ) {
             if ( ChronoUnit.MINUTES.between(entry.getValue().getTime(), time) > 1 ) {
@@ -38,7 +38,7 @@ public class PointRecord {
         toDelete.clear();
     }
 
-    public void addToRecord( Point p, String id, LocalDateTime time ) {
+    public void addToRecord( Point p, String id, LocalTime time ) {
         if ( prevPoints.containsKey(id) ) {
             //System.out.println("Point " + p.getId() + " already existed, calculating deltas.");
             p.setRotation(GeoUtils.calculateRotation(p, prevPoints.get(id)));

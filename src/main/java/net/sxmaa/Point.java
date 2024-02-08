@@ -1,6 +1,6 @@
 package net.sxmaa;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Random;
 
 public class Point {
@@ -12,7 +12,7 @@ public class Point {
     private int height;
     private double speed;
     private double rateofclimb;
-    private LocalDateTime time;
+    private LocalTime time;
 
     public Point(double latitude, double longitude, double rotation, int height) {
         Random rand = new Random();
@@ -61,7 +61,7 @@ public class Point {
         return speed;
     }
 
-    public LocalDateTime getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
@@ -81,7 +81,7 @@ public class Point {
         this.rotation = rotation;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
