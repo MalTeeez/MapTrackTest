@@ -1,6 +1,7 @@
 package net.sxmaa;
 
-import java.time.LocalDateTime;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
@@ -18,26 +19,28 @@ public class GeoUtils {
         // beta = atan2(Y, X)
         double deltaL = deg2rad( previous.getLongitude() - current.getLongitude() );
 
-        double X = cos(deg2rad(current.getLatitude())) * sin(deltaL);
-        double Y = cos(deg2rad(previous.getLatitude())) *
-                    sin(deg2rad(current.getLatitude())) -
-                    sin(deg2rad(previous.getLatitude())) *
-                    cos(deg2rad(current.getLatitude())) *
+        double curr_lat_radian = deg2rad(current.getLatitude());
+        double prev_lat_radian = deg2rad(previous.getLatitude());
+        double X = cos(curr_lat_radian) * sin(deltaL);
+        double Y = cos(prev_lat_radian) *
+                    sin(curr_lat_radian) -
+                    sin(prev_lat_radian) *
+                    cos(curr_lat_radian) *
                     cos(deltaL);
 
         double beta = Math.atan2(Y, X);
 
-        // convert to degrees, shorten to float since we don't need crazy precision
-        return (float) (beta / Math.PI * 180);
+        // convert to degrees
+        return roundDecimals((beta / Math.PI * 180), 2);
     }
 
-    public static double calculateSpeed(Point current, Point previous, LocalTime previousTime, LocalTime currentTime ) {
+    public static float calculateSpeed(Point current, Point previous, LocalTime previousTime, LocalTime currentTime ) {
         long deltaT = ChronoUnit.MILLIS.between(currentTime, previousTime);
         double distance = calculateDistance(current, previous);
         double speed = distance / deltaT; // In Kilometers per Millisecond (km/ms)
         speed *= 1000; // In Kilometers per Second (km/s)
         if ( speed * 3600 > 5000 ) speed = 0; // Exclude ridiculous speeds, we don't have SR-71's anymore ):
-        return speed * 3600; // In Kilometers per Hour (km/h)
+        return roundDecimals(speed * 3600, 3); // In Kilometers per Hour (km/h)
     }
 
     public static double calculateDistance(Point start, Point destination) {
@@ -53,12 +56,19 @@ public class GeoUtils {
         return 2 * r * asin(sqrt(a));
     }
 
-    public static double calculateRateOfClimb( Point current, Point previous, LocalTime previousTime, LocalTime currentTime ) {
+    public static float calculateRateOfClimb( Point current, Point previous, LocalTime previousTime, LocalTime currentTime ) {
         double deltaT = ChronoUnit.MILLIS.between(currentTime, previousTime); // In seconds
         double deltaH = current.getHeight() - previous.getHeight();
-        return (deltaH / deltaT) * 3600; // In Feet per Minute (ft/s)
+        return roundDecimals((deltaH / deltaT) * 3600, 3); // In Feet per Minute (ft/s)
     }
+
     private static double deg2rad(double degree) {
         return degree * (Math.PI/180);
+    }
+
+    private static float roundDecimals(double value, int decimals) {
+        DecimalFormat df = new DecimalFormat("#." + new String(new char[decimals]).replace("\0", "#"));
+        df.setRoundingMode(RoundingMode.HALF_EVEN);
+        return Float.parseFloat(df.format(value));
     }
 }

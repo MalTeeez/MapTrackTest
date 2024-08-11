@@ -3,6 +3,8 @@ package net.sxmaa;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,21 +18,29 @@ public class ExampleData {
 
 
     public static Point getRandomWLD() {
-        Random r = new Random();
-        double lon = r.nextDouble(-90, 91);
-        double lat = r.nextDouble(-180, 181);
-        double rot = r.nextDouble(0, 361);
-        int hei = r.nextInt(0, 35000);
+        double lon = generateDouble(-90, 91);
+        double lat = generateDouble(-180, 181);
+        double rot = generateDouble(0, 361);
+        int hei = generateInt(0, 35000);
         return new Point(lat, lon, rot, hei);
     }
 
     public static Point getRandomDEU() {
-        Random r = new Random();
-        double lat = r.nextDouble(46, 55);
-        double lon = r.nextDouble(5, 15);
-        double rot = r.nextDouble(0, 361);
-        int hei = r.nextInt(0, 35000);
+        double lat = generateDouble(46, 55);
+        double lon = generateDouble(5, 15);
+        double rot = generateDouble(0, 361);
+        int hei = generateInt(0, 35000);
         return new Point(lat, lon, rot, hei);
+    }
+
+    private static double generateDouble(int min, int max) {
+        Random r = new Random();
+        return min + (max - min) * r.nextDouble();
+    }
+
+    private static int generateInt(int min, int max) {
+        Random r = new Random();
+        return min + (max - min) * r.nextInt();
     }
 
     public static void readFromFile() {
@@ -71,15 +81,22 @@ public class ExampleData {
         // Only set id to callsign if it actually exists for this plane, otherwise fallback to numeric id
         id = !Objects.equals(callsign, "") ? callsign : id;
 
+        // Using 5 decimal places, see https://gis.stackexchange.com/a/8674
+        DecimalFormat df = new DecimalFormat("#.#####");
+        df.setRoundingMode(RoundingMode.HALF_EVEN);
+
         String lat_s = l[5].replaceAll("[^0-9]+", "");
         double latitude = Double.parseDouble(lat_s.substring(0, 2));
         latitude += Double.parseDouble(lat_s.substring(2, 4)) / 60;
         latitude += Double.parseDouble(lat_s.substring(4, 6)) / 3600;
+        latitude = roundDecimals(latitude);
+
 
         String lon_s = l[6].replaceAll("[^0-9]+", "");
         double longitude = Double.parseDouble(lon_s.substring(0, 3));
         longitude += Double.parseDouble(lon_s.substring(3, 5)) / 60;
         longitude += Double.parseDouble(lon_s.substring(5, 7)) / 3600;
+        longitude = roundDecimals(longitude);
 
         return new Point(id, latitude, longitude, altitude);
     }
@@ -93,4 +110,11 @@ public class ExampleData {
                 Integer.parseInt(times[2].substring(3,4)) * 100000000
         );
     }
+
+    private static double roundDecimals(double value) {
+        DecimalFormat df = new DecimalFormat("#.#####");
+        df.setRoundingMode(RoundingMode.HALF_EVEN);
+        return Double.parseDouble(df.format(value));
+    }
+
 }
